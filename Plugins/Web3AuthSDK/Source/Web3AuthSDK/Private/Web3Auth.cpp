@@ -135,7 +135,7 @@ void AWeb3Auth::request(FString  path, FLoginParams* loginParams = NULL, TShared
 
 		CallJniVoidMethod(Env, jbrowserViewClass, jlaunchUrl, FJavaWrapper::GameActivityThis, jurl);
 	}
-#elseif PLATFORM_IOS
+#elif PLATFORM_IOS
 	[launchUrl:TCHAR_TO_ANSI(*url)];
 #else
 	FPlatformProcess::LaunchURL(*url, NULL, NULL);

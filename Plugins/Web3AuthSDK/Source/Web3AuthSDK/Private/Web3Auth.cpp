@@ -2,6 +2,7 @@
 
 
 #include "Web3Auth.h"
+#include "Misc/AES.h"
 
 //#define PLATFORM_ANDROID 1
 //#define USE_ANDROID_JNI 1
@@ -252,6 +253,44 @@ FString AWeb3Auth::startLocalWebServer() {
 	return "http://localhost:"+ FString::FromInt(port) + "/complete";
 }
 
+FString AWeb3Auth::Web3AuthGetPrivateKey(FWeb3AuthResponse response) {
+	FString output;
+	output = response.privKey;
+	return output;
+}
+
+FString AWeb3Auth::Web3AuthGetAuthToken(FWeb3AuthResponse response) {
+	FString output;
+	output = response.authToken;
+	return output;
+}
+
+FString AWeb3Auth::Encrypt(FString msgString,FString keyString) {
+	
+	UE_LOG(LogTemp, Warning, TEXT("msgString 1 %s"), *msgString);
+	UE_LOG(LogTemp, Warning, TEXT("keyString 1 %s"), *keyString);
+	ANSICHAR* Key = TCHAR_TO_ANSI(*keyString);
+	UE_LOG(LogTemp, Warning, TEXT("log 1"));
+	if(msgString.IsEmpty()) return msgString;  
+	
+	uint8* Blob; 
+	uint32 Size; 
+	Size = msgString.Len() * 0.5;
+	// Size = Size + (FAES::AESBlockSize - (Size % FAES::AESBlockSize));
+	Blob = new uint8[Size]; 
+
+	if( FString::ToBlob(msgString,Blob,msgString.Len())) { 
+		UE_LOG(LogTemp, Warning, TEXT("log 2"));
+		FAES::EncryptData(Blob,Size,Key); 
+		msgString = FString::FromHexBlob(Blob,Size); 
+		UE_LOG(LogTemp, Warning, TEXT("msgString 2 %s"), *msgString);
+		delete Blob; 
+		return msgString; 
+	}
+	UE_LOG(LogTemp, Warning, TEXT("log 3"));
+	delete Blob;
+	return "";
+}
 
 bool AWeb3Auth::requestAuthCallback(const FHttpServerRequest& Request, const FHttpResultCallback& OnComplete)
 {
@@ -328,13 +367,11 @@ void AWeb3Auth::setLogoutEvent(FOnLogout _event) {
 	logoutEvent = _event;
 }
 
-
 void AWeb3Auth::BeginPlay()
 {
 	Super::BeginPlay();
 
 }
-
 
 void AWeb3Auth::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {

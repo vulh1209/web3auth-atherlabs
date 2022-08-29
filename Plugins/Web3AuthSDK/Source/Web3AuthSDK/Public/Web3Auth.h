@@ -486,8 +486,11 @@ struct FWeb3AuthResponse
 {
 	GENERATED_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString privKey;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FString authToken;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		FString ed25519PrivKey;
@@ -557,7 +560,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Web3Auth")
 		static void setLogoutEvent(FOnLogout _event);
 
+	UFUNCTION(BlueprintCallable, Category = "Web3Auth")
+		static FString Web3AuthGetPrivateKey(FWeb3AuthResponse response);
 
+	UFUNCTION(BlueprintCallable, Category = "Web3Auth")
+		static FString Web3AuthGetAuthToken(FWeb3AuthResponse response) ;
+
+	UFUNCTION(BlueprintCallable, Category = "Web3Auth")
+		static FString Encrypt(FString msgString,FString keyString);
 
 	UFUNCTION(BlueprintCallable)
 		static FString Web3AuthResponseToJsonString(FWeb3AuthResponse response) {
@@ -566,8 +576,6 @@ public:
 
 		return output;
 	}
-
-
 
 	~AWeb3Auth();
 private:
